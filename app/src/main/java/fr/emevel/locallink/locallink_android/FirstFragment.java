@@ -20,6 +20,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import java.io.File;
 
 import fr.emevel.locallink.locallink_android.databinding.FragmentFirstBinding;
+import fr.emevel.locallink.server.sync.LocalSyncFolder;
+import fr.emevel.locallink.server.sync.SyncFolder;
 
 public class FirstFragment extends Fragment {
 
@@ -73,26 +75,54 @@ public class FirstFragment extends Fragment {
                 dirRequest.launch(
                         Uri.parse(Environment.getExternalStorageDirectory().toURI().toString())
                 );
+            }
+        });
 
-
-                //NavHostFragment.findNavController(FirstFragment.this).navigate(R.id.action_FirstFragment_to_SecondFragment);
+        binding.button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(FirstFragment.this).navigate(R.id.action_FirstFragment_to_SecondFragment);
             }
         });
     }
 
-    public void add(File file) {
+    public void loadAll() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                for (SyncFolder folder : MainActivity.serverData.getFolders().getFolders()) {
+                    if (folder instanceof LocalSyncFolder) {
+                        add((LocalSyncFolder) folder);
+                    }
+                }
+            }
+        });
+    }
+
+    public void add(LocalSyncFolder folder) {
         View view = getLayoutInflater().inflate(R.layout.folder, null);
         TextView text = view.findViewById(R.id.name);
-        text.setText(file.getAbsolutePath());
+        text.setText(folder.getFolder().getAbsolutePath());
         ImageView image = view.findViewById(R.id.logo);
+
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MainActivity.serverData.getFolders().removeFolder(folder);
+                MainActivity.serverSaveData.run();
                 layout.removeView(view);
             }
         });
 
         layout.addView(view);
+    }
+
+    public void add(File file) {
+        LocalSyncFolder folder = new LocalSyncFolder(file);
+        add(folder);
+        MainActivity.serverData.getFolders().addFolder(folder);
+
+        MainActivity.serverSaveData.run();
     }
 
     @Override

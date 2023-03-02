@@ -45,4 +45,5 @@ dependencies {
 
     implementation 'fr.emevel.locallink:locallink-network:1.0-SNAPSHOT'
     implementation 'fr.emevel.locallink:locallink-client:1.0-SNAPSHOT'
+    implementation 'fr.emevel.locallink:locallink-server:1.0-SNAPSHOT'
 }

@@ -33,6 +33,7 @@
 
     <ScrollView
         android:id="@+id/scrollView"
+        android:contentDescription="scrollView"
         android:layout_width="409dp"
         android:layout_height="400dp"
         app:layout_constraintBottom_toTopOf="@+id/button_first"
@@ -47,4 +48,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" />
     </ScrollView>
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="52dp"
+        android:text="Clients"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
