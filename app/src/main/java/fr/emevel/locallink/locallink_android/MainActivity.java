@@ -1,6 +1,10 @@
 package fr.emevel.locallink.locallink_android;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -92,9 +96,44 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_reset) {
+            new Thread(() -> {
+                clientData = new LocalLinkClientData();
+                DataSaving<LocalLinkClientData> clientDataSaver = DataSaving.localFile(new File(getFilesDir(), "client.dat"));
+                clientSaveData = clientDataSaver.saver(clientData);
+
+                serverData = new LocalLinkServerData();
+                DataSaving<LocalLinkServerData> dataSaver =  DataSaving.localFile(new File(getFilesDir(), "server.dat"));
+                serverSaveData = dataSaver.saver(serverData);
+
+                if (!clientData.getUuid().equals(serverData.getUuid())) {
+                    clientData.setUuid(serverData.getUuid());
+                }
+                serverSaveData.run();
+                clientSaveData.run();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        restartApp();
+                    }
+                });
+
+            }).start();
+
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void restartApp() {
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        int mPendingIntentId = 555;
+        PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+        System.exit(0);
     }
 
     @Override
