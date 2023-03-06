@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -36,6 +37,7 @@ public class SecondFragment extends Fragment {
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
+        instance = this;
 
         binding = FragmentSecondBinding.inflate(inflater, container, false);
 
@@ -80,6 +82,17 @@ public class SecondFragment extends Fragment {
 
     public void add(LocalLinkClient client) {
         View view = getLayoutInflater().inflate(R.layout.client, null);
+
+        Button b = view.findViewById(R.id.client_folders);
+
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SelectClientFolderFragment.client = client;
+                NavHostFragment.findNavController(SecondFragment.this)
+                        .navigate(R.id.action_SecondFragment_to_SelectSyncFolder);
+            }
+        });
 
         getActivity().runOnUiThread(new Runnable() {
             @Override

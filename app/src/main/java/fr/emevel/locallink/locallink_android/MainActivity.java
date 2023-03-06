@@ -23,12 +23,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.emevel.locallink.client.ClientMain;
 import fr.emevel.locallink.client.LocalLinkClient;
 import fr.emevel.locallink.client.LocalLinkClientData;
 import fr.emevel.locallink.locallink_android.databinding.ActivityMainBinding;
+import fr.emevel.locallink.network.DataSaving;
 import fr.emevel.locallink.server.LocalLinkServerData;
-import fr.emevel.locallink.server.ServerMain;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,10 +36,14 @@ public class MainActivity extends AppCompatActivity {
 
     private int EXTERNAL_STORAGE_PERMISSION_CODE = 23;
 
-    public static LocalLinkClient client;
     public static AndroidLocalLinkServer server;
     public static LocalLinkServerData serverData;
     public static Runnable serverSaveData;
+
+    public static LocalLinkClient client;
+    public static LocalLinkClientData clientData;
+    public static Runnable clientSaveData;
+
     public static WifiManager.MulticastLock lock;
 
     public static List<ClientElement> clients = new ArrayList<>();
@@ -127,34 +130,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startClient() throws IOException {
-        File file = new File(getFilesDir(), "client.dat");
-        LocalLinkClientData data = ClientMain.loadDataFromFile(file);
+        File clientFile = new File(getFilesDir(), "client.dat");
 
-        Runnable saveData = () -> {
-            try {
-                ClientMain.saveDataToFile(data, file);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        };
+        DataSaving<LocalLinkClientData> clientDataSaver = DataSaving.localFile(clientFile);
+        clientData = clientDataSaver.load(LocalLinkClientData::new);
+        clientSaveData = clientDataSaver.saver(clientData);
 
-        client = new LocalLinkClient(data, Environment.getExternalStorageDirectory(), saveData);
+
+        if (!clientData.getUuid().equals(serverData.getUuid())) {
+            clientData.setUuid(serverData.getUuid());
+            clientSaveData.run();
+        }
+
+        System.out.println("Starting client...");
+
+        client = new LocalLinkClient(clientData, Environment.getExternalStorageDirectory(), clientSaveData);
 
         client.start();
     }
 
     public void startServer() throws IOException {
-        File file = new File(getFilesDir(), "server.dat");
+        File serverFile = new File(getFilesDir(), "server.dat");
 
-        serverData = ServerMain.loadDataFromFile(file);
-
-        serverSaveData = () -> {
-            try {
-                ServerMain.saveDataToFile(serverData, file);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        };
+        DataSaving<LocalLinkServerData> dataSaver =  DataSaving.localFile(serverFile);
+        serverData = dataSaver.load(LocalLinkServerData::new);
+        serverSaveData = dataSaver.saver(serverData);
 
         System.out.println("Starting server...");
 
@@ -181,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 startServer();
+                startClient();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

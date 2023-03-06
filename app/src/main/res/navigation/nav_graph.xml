@@ -24,5 +24,28 @@
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
+
+        <action
+            android:id="@+id/action_SecondFragment_to_SelectSyncFolder"
+            app:destination="@+id/SelectSyncFolder"/>
+    </fragment>
+
+    <fragment android:id="@+id/SelectSyncFolder"
+        android:name="fr.emevel.locallink.locallink_android.SelectSyncFolderFragment"
+        android:label="@string/add_sync_folder_label"
+        tools:layout="@layout/select_sync_folder">
+
+        <action
+            android:id="@+id/action_SelectSyncFolder_to_SelectClientFolder"
+            app:destination="@+id/SelectClientFolder"/>
+    </fragment>
+
+    <fragment android:id="@+id/SelectClientFolder"
+        android:name="fr.emevel.locallink.locallink_android.SelectClientFolderFragment"
+        android:label="@string/add_client_folder_label"
+        tools:layout="@layout/select_client_folder">
+        <action
+            android:id="@+id/action_SelectClientFolder_to_Second"
+            app:destination="@+id/SecondFragment"/>
     </fragment>
 </navigation>

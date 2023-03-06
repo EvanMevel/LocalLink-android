@@ -4,6 +4,8 @@
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">LocalLink-app</string>
     <string name="second_fragment_label">LocalLink-app</string>
+    <string name="add_sync_folder_label">LocalLink-app</string>
+    <string name="add_client_folder_label">LocalLink-app</string>
     <string name="next">Add a folder</string>
     <string name="previous">Back</string>
 

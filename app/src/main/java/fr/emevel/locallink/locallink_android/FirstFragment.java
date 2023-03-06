@@ -66,6 +66,7 @@ public class FirstFragment extends Fragment {
         return binding.getRoot();
     }
 
+    @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -84,9 +85,14 @@ public class FirstFragment extends Fragment {
                 NavHostFragment.findNavController(FirstFragment.this).navigate(R.id.action_FirstFragment_to_SecondFragment);
             }
         });
+
+        loadAll();
     }
 
     public void loadAll() {
+        if (MainActivity.serverData == null) {
+            return;
+        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
